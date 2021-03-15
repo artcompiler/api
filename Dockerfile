@@ -1,5 +1,7 @@
 FROM node:12 as builder
 
+WORKDIR /usr/src/app
+
 # Install app dependencies
 COPY package*.json ./
 
@@ -21,7 +23,7 @@ COPY package*.json ./
 RUN npm ci --production
 
 # Bundle app source
-COPY --from=builder build build
+COPY --from=builder /usr/src/app/build build
 
 CMD [ "node", "build/src/app.js" ]
 USER node
