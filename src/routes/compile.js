@@ -51,7 +51,7 @@ module.exports = () => {
       res.set("Access-Control-Allow-Origin", "*");
       res.status(statusCode).json(val);
     } catch(err) {
-      res.status(statusCodeFromErrors(err)).json(messageFromErrors(err));
+      res.sendStatus(statusCodeFromErrors(err));
     }
   });
   return router;
