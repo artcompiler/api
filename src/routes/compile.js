@@ -32,7 +32,7 @@ module.exports = () => {
       res.sendStatus(204);
     } catch(err) {
       console.log("OPTIONS /compile err=" + err);
-      res.statusStatus(500);
+      res.sendStatus(500);
     }
   });
   router.post('/', async (req, res) => {
