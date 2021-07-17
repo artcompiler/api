@@ -34,7 +34,7 @@
     "react-dom": "0.14.5",
     "supertest": "^4.0.2",
     "ts-jest": "^26.5.5",
-    "typescript": "^3.9.7",
+    "typescript": "^3.9.10",
     "uglify-js": "^2.7.3"
   },
   "scripts": {
