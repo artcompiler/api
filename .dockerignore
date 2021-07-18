@@ -1,8 +1,0 @@
-# NPM
-node_modules/
-
-# Graffiticode API
-cloudbuild.deploy.json
-Dockerfile
-docs/
-Makefile
