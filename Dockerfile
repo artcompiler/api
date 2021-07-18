@@ -16,4 +16,4 @@ RUN npm run build
 RUN npm ci --production
 
 ENV NODE_ENV=production
-CMD ["node", "-r", "@graffiticode/tracing",, "build/src/app.js"]
+CMD ["node", "-r", "@graffiticode/tracing", "build/src/app.js"]
