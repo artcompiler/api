@@ -1,29 +1,19 @@
-FROM node:12 as builder
+# syntax=docker/dockerfile:1
 
-WORKDIR /usr/src/app
+FROM node:alpine AS builder
 
-# Install app dependencies
-COPY package*.json ./
+WORKDIR /workspace
 
+# Install build dependencies
+COPY ["package.json", "package-lock.json*", "./"]
 RUN npm install
 
-# Bundle app source
+# Build static files
 COPY . .
-
 RUN npm run build
 
-FROM node:12-alpine as app
-
-# Create app directory
-WORKDIR /usr/src/app
-
-# Install app dependencies
-COPY package*.json ./
-
+# Install production dependencies
 RUN npm ci --production
 
-# Bundle app source
-COPY --from=builder /usr/src/app/build build
-
-CMD [ "node", "build/src/app.js" ]
-USER node
+ENV NODE_ENV=production
+CMD ["node", "-r", "@graffiticode/tracing", "build/src/app.js"]
