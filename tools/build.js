@@ -42,7 +42,7 @@ function clean() {
 
 function compile() {
   console.log('Compiling...');
-  exec('tsc');
+  exec('npx tsc');
 }
 
 function bundle() {
