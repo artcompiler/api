@@ -86,26 +86,23 @@ function dumpMap(map) {
 const objIDMap = new Map([[JSON.stringify({}), 1]]);
 const idObjMap = new Map([[1, {}]]);
 function objectToID(obj) {
-  return new Promise((accept, reject) => {
-    let id;
-    if (obj === null) {
-      id = 0;
-    } else {
-      if (!objIDMap.has(JSON.stringify(obj))) {
-        let id = idObjMap.size + 1;
-        objIDMap.set(JSON.stringify(obj), id);
-        idObjMap.set(id, obj);
-      }
-      id = objIDMap.get(JSON.stringify(obj));
+  let id;
+  if (obj === null) {
+    id = 0;
+  } else {
+    if (!objIDMap.has(JSON.stringify(obj))) {
+      let id = idObjMap.size + 1;
+      objIDMap.set(JSON.stringify(obj), id);
+      idObjMap.set(id, obj);
     }
-    accept(id);
-  });
+    id = objIDMap.get(JSON.stringify(obj));
+  }
+  return id;
 }
 
 function objectFromID(id) {
-  return new Promise((accept, reject) => {
-    accept(idObjMap.get(id));
-  });
+//  dumpMap(idObjMap);
+  return idObjMap.get(id);
 }
 
 module.exports.decodeID = decodeID;

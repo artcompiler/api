@@ -6,8 +6,9 @@ import uuid from 'uuid';
 
 import { getConfig } from './../config';
 import { pingLang, getAsset } from './../lang';
-import { isNonEmptyString } from './../util'
+import { isNonEmptyString } from './../util';
 
+import task from './task';
 import compile from './compile';
 import buildConfigHandler from './config';
 import { buildLangRouter } from './lang';
@@ -35,6 +36,7 @@ const proxyHandler = buildProxyHandler({
 });
 
 export {
+  task,
   compile,
   langRouter,
   configHandler,
