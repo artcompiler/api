@@ -16,11 +16,17 @@ describe('/task endpoint', () => {
     request(app)
       .post('/task')
       .send({task: task})
-      .expect(200, done);
+      .expect((res) => {
+        delete res.body._;
+      })
+      .expect(200, {id: taskID}, done);
   });
   it('GET /task', (done) => {
     request(app)
       .get('/task?id=' + taskID)
+      .expect((res) => {
+        delete res.body._;
+      })
       .expect(200, task, done);
   });
 });

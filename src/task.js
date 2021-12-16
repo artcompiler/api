@@ -33,10 +33,8 @@ function taskFromID(id) {
   //   code is an AST which may or may not be in the AST store, and
   try {
     const ids = decodeID(id);
-    console.log("taskFromID() ids=" + ids);
     const lang = String(ids[0]);
     const code = objectFromID(ids[1]);
-    console.log("taskFromID() code=" + JSON.stringify(code));
     const task = {lang: lang, code: code};
     return task;
   } catch (err) {
