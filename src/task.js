@@ -50,7 +50,6 @@ function postTask(auth, task) {
     task.forEach((task) => {
       const id = postTask(auth, task);
       ids.push(id);
-      compileID(auth, id, {}, () => {});  // Prime the cache.
     });
     id = ids;
   } else {

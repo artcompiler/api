@@ -8,6 +8,7 @@ import { getConfig } from './../config';
 import { pingLang, getAsset } from './../lang';
 import { isNonEmptyString } from './../util';
 
+import data from './data';
 import task from './task';
 import compile from './compile';
 import buildConfigHandler from './config';
@@ -36,6 +37,7 @@ const proxyHandler = buildProxyHandler({
 });
 
 export {
+  data,
   task,
   compile,
   langRouter,

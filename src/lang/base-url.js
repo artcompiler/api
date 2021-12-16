@@ -13,7 +13,7 @@ export function buildGetBaseUrlForLanguage({
     if (isNonEmptyString(envBaseUrl)) {
       return envBaseUrl;
     }
-    const config = getConfig();
+    const config = getConfig() || {};
     const host = getCompilerHost(lang, config);
     const port = getCompilerPort(lang, config);
     let protocol = 'https';
