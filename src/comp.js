@@ -11,14 +11,8 @@ function getLang(ids, resume) {
 }
 
 function getCode(ids, resume) {
-  objectFromID(ids[1])
-    .then(val => {
-      resume(null, val);
-    })
-    .catch(err => {
-      console.log("getCode() err=" + err.stack);
-      resume([internalError(err)]);
-    });
+  const val = objectFromID(ids[1]);
+  resume(null, val);
 }
 
 function getData(ids, resume) {
@@ -28,14 +22,8 @@ function getData(ids, resume) {
     ids = ids.slice(2);
     assert(ids.length === 3);
     assert(ids[0] === 113);   // L113 code is stored as data not an AST.
-    objectFromID(ids[1])
-      .then(val => {
-        resume(null, val);
-      })
-      .catch(err => {
-        console.trace();
-        resume([internalError(err)]);
-      });
+    const val = objectFromID(ids[1]);
+    resume(null, val);
   }
 }
 

@@ -1,5 +1,6 @@
 const assert = require('assert');
 const {decodeID, encodeID, objectToID, objectFromID} = require('./id');
+const {compileID} = require('./comp');
 const nilID = encodeID([0,0,0]);
 
 function verifyCode(code) {
@@ -42,15 +43,19 @@ function taskFromID(id) {
   }
 }
 
-function postTask(task) {
+function postTask(auth, task) {
   let id;
   if (task instanceof Array) {
-    id = [];
+    const ids = [];
     task.forEach((task) => {
-      id.push(postTask(task));
+      const id = postTask(auth, task);
+      ids.push(id);
+      compileID(auth, id, {}, () => {});  // Prime the cache.
     });
+    id = ids;
   } else {
     id = taskToID(task);
+    compileID(auth, id, {}, () => {});  // Prime the cache.
   }
   return id;
 }
@@ -58,10 +63,11 @@ function postTask(task) {
 function getTask(id) {
   let task;
   if (id instanceof Array) {
-    task = [];
+    const tasks = [];
     id.forEach((id) => {
-      task.push(getTask(id));
+      tasks.push(getTask(id));
     });
+    task = tasks;
   } else {
     task = taskFromID(id);
   }

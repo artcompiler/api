@@ -79,7 +79,7 @@ function encodeID(ids) {
 
 function dumpMap(map) {
   map.forEach((val, key) => {
-    console.log(JSON.stringify(key) + " => " + JSON.stringify(val))
+    console.log(JSON.stringify(key) + " => " + JSON.stringify(val));
   });
 }
 
@@ -101,7 +101,7 @@ function objectToID(obj) {
 }
 
 function objectFromID(id) {
-//  dumpMap(idObjMap);
+  // dumpMap(idObjMap);
   return idObjMap.get(id);
 }
 

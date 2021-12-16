@@ -9,6 +9,7 @@ module.exports = () => {
     try {
       const auth = req.query.auth;
       const id = req.query.id;
+      id = id.indexOf(',') < 0 && id || id.split(',');
       error(id !== undefined, "Missing task in GET /task.");
       const t0 = new Date;
       const task = getTask(id);
@@ -40,10 +41,10 @@ module.exports = () => {
       const task = body.task;
       const auth = body.auth;
       error(task, "Missing task in POST /task.");
-      error(!isNaN(parseInt(task.lang)), "Invalid language identifier in POST /task data.");
-      error(task.code, "Invalid code in POST /task data.");
+      // error(!isNaN(parseInt(task.lang)), "Invalid language identifier in POST /task data.");
+      // error(task.code, "Invalid code in POST /task data.");
       const t0 = new Date;
-      const id = postTask(task);
+      const id = postTask(auth, task);
       const statusCode = id === null && 400 || 200;
       const val = {id: id};
       setMetadataBuilds(val, build);
