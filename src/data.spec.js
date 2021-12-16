@@ -29,7 +29,7 @@ describe('data', () => {
   describe('postTask task', () => {
     it('mapping a task to an ID', async () => {
       expect(
-        postTask(auth, task)
+        await postTask(auth, task)
       ).to.equal(taskID);
     });
   });
@@ -41,9 +41,9 @@ describe('data', () => {
     });
   });
   describe('postTask [task*]', () => {
-    it('mapping tasks to an IDs', () => {
+    it('mapping tasks to an IDs', async () => {
       expect(
-        postTask(auth, [task, task2])
+        await postTask(auth, [task, task2])
       ).to.eql([taskID, taskID2]);
     });
   });

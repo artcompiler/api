@@ -12,7 +12,7 @@ module.exports = () => {
       id = id.indexOf(',') < 0 && id || id.split(',');
       error(id !== undefined, "Missing task in GET /task.");
       const t0 = new Date;
-      const task = getTask(id);
+      const task = await getTask(id);
       setMetadataBuilds(task, build);
       res.set("Access-Control-Allow-Origin", "*");
       res.status(200).json(task);
@@ -44,7 +44,7 @@ module.exports = () => {
       // error(!isNaN(parseInt(task.lang)), "Invalid language identifier in POST /task data.");
       // error(task.code, "Invalid code in POST /task data.");
       const t0 = new Date;
-      const id = postTask(auth, task);
+      const id = await postTask(auth, task);
       const statusCode = id === null && 400 || 200;
       const val = {id: id};
       setMetadataBuilds(val, build);

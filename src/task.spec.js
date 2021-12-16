@@ -39,16 +39,16 @@ describe('task', function() {
     });
   });
   describe('postTask [task*]', () => {
-    it('mapping tasks to an IDs', () => {
+    it('mapping tasks to an IDs', async () => {
       expect(
-        postTask(auth, [task, task2])
+        await postTask(auth, [task, task2])
       ).to.eql([taskID, taskID2]);
     });
   });
   describe('getTask [ID*]', () => {
-    it('mapping IDs to tasks', () => {
+    it('mapping IDs to tasks', async () => {
       expect(
-        getTask([taskID, taskID2])
+        await getTask([taskID, taskID2])
       ).to.eql([task, task2]);
     });
   });

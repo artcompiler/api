@@ -43,12 +43,12 @@ function taskFromID(id) {
   }
 }
 
-function postTask(auth, task) {
+async function postTask(auth, task) {
   let id;
   if (task instanceof Array) {
     const ids = [];
-    task.forEach((task) => {
-      const id = postTask(auth, task);
+    task.forEach(async (task) => {
+      const id = await postTask(auth, task);
       ids.push(id);
     });
     id = ids;
@@ -59,12 +59,12 @@ function postTask(auth, task) {
   return id;
 }
 
-function getTask(id) {
+async function getTask(id) {
   let task;
   if (id instanceof Array) {
     const tasks = [];
-    id.forEach((id) => {
-      tasks.push(getTask(id));
+    id.forEach(async (id) => {
+      tasks.push(await getTask(id));
     });
     task = tasks;
   } else {
