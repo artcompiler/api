@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { postTask } = require('./task');
+const { postTask, postTasks } = require('./task');
 const { getData } = require('./data');
 const auth = null;
 describe('data', () => {
@@ -30,7 +30,7 @@ describe('data', () => {
     it('mapping a task to an ID', async () => {
       expect(
         await postTask(auth, task)
-      ).to.equal(taskID);
+      ).to.eql(taskID);
     });
   });
   describe('getData ID', () => {
@@ -43,7 +43,7 @@ describe('data', () => {
   describe('postTask [task*]', () => {
     it('mapping tasks to an IDs', async () => {
       expect(
-        await postTask(auth, [task, task2])
+        await postTasks(auth, [task, task2])
       ).to.eql([taskID, taskID2]);
     });
   });

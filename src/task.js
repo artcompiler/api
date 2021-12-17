@@ -43,19 +43,16 @@ function taskFromID(id) {
   }
 }
 
+async function postTasks(auth, tasks) {
+  tasks = [].concat(tasks);
+  return Promise.all(tasks.map((task) => {
+    return postTask(auth, task);
+  }));
+}
+
 async function postTask(auth, task) {
-  let id;
-  if (task instanceof Array) {
-    const ids = [];
-    task.forEach(async (task) => {
-      const id = await postTask(auth, task);
-      ids.push(id);
-    });
-    id = ids;
-  } else {
-    id = taskToID(task);
-    compileID(auth, id, {}, () => {});  // Prime the cache.
-  }
+  let id = taskToID(task);
+  compileID(auth, id, {}, () => {});  // Prime the cache.
   return id;
 }
 
@@ -74,4 +71,5 @@ async function getTask(id) {
 }
 
 exports.postTask = postTask;
+exports.postTasks = postTasks;
 exports.getTask = getTask;

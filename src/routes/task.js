@@ -1,6 +1,6 @@
 const assert = require('assert');
 const {Router} = require('express');
-const {getTask, postTask} = require('../task');
+const {getTask, postTasks} = require('../task');
 const {error, statusCodeFromErrors, messageFromErrors, setMetadataBuilds} = require('../util');
 const build = require('../../build.json');
 module.exports = () => {
@@ -44,12 +44,12 @@ module.exports = () => {
       // error(!isNaN(parseInt(task.lang)), "Invalid language identifier in POST /task data.");
       // error(task.code, "Invalid code in POST /task data.");
       const t0 = new Date;
-      const id = await postTask(auth, task);
-      const statusCode = id === null && 400 || 200;
+      const id = await postTasks(auth, task);
+      id = id.length === 1 && id[0] || id;
       const val = {id: id};
       setMetadataBuilds(val, build);
       res.set("Access-Control-Allow-Origin", "*");
-      res.status(statusCode).json(val);
+      res.status(200).json(val);
     } catch(err) {
       console.log("POST /task err=" + err);
       res.status(400).json({
