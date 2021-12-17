@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { postTask, postTasks, getTask } = require('./task');
+const { postTasks, getTasks } = require('./task');
 const { encodeID, objectToID } = require('./id');
 const auth = null;
 const TIMEOUT_DURATION = 5000;
@@ -31,11 +31,11 @@ describe('task', function() {
       ).to.eql([taskID]);
     });
   });
-  describe('getTask ID', () => {
+  describe('getTasks ID', () => {
     it('mapping a task to an ID', async () => {
       expect(
-        await getTask(taskID)
-      ).to.eql(task);
+        await getTasks(auth, taskID)
+      ).to.eql([task]);
     });
   });
   describe('postTasks [task*]', () => {
@@ -45,10 +45,10 @@ describe('task', function() {
       ).to.eql([taskID, taskID2]);
     });
   });
-  describe('getTask [ID*]', () => {
+  describe('getTasks [ID*]', () => {
     it('mapping IDs to tasks', async () => {
       expect(
-        await getTask([taskID, taskID2])
+        await getTasks(auth, [taskID, taskID2])
       ).to.eql([task, task2]);
     });
   });

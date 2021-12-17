@@ -44,32 +44,32 @@ function taskFromID(id) {
 }
 
 async function postTasks(auth, tasks) {
-  tasks = [].concat(tasks);
+  if (!(tasks instanceof Array)) {
+    tasks = [tasks];
+  }
   return Promise.all(tasks.map((task) => {
     return postTask(auth, task);
   }));
 }
 
 async function postTask(auth, task) {
-  let id = taskToID(task);
+  const id = taskToID(task);
   compileID(auth, id, {}, () => {});  // Prime the cache.
   return id;
 }
 
-async function getTask(id) {
-  let task;
-  if (id instanceof Array) {
-    const tasks = [];
-    id.forEach(async (id) => {
-      tasks.push(await getTask(id));
-    });
-    task = tasks;
-  } else {
-    task = taskFromID(id);
+async function getTasks(auth, ids) {
+  if (!(ids instanceof Array)) {
+    ids = [ids];
   }
-  return task;
+  return Promise.all(ids.map((id) => {
+    return getTask(auth, id);
+  }));
 }
 
-exports.postTask = postTask;
+async function getTask(auth, id) {
+  return taskFromID(id);
+}
+
 exports.postTasks = postTasks;
-exports.getTask = getTask;
+exports.getTasks = getTasks;

@@ -13,9 +13,7 @@ module.exports = () => {
       error(item, "Missing item in POST /compile.");
       error(!isNaN(parseInt(item.lang)), "Invalid language identifier in POST /compile data.");
       error(item.code, "Invalid code in POST /compile data.");
-      let t0 = new Date;
       let val = await compile(auth, item);
-      console.log("GET /compile in " + (new Date - t0) + "ms");
       res.set("Access-Control-Allow-Origin", "*");
       res.status(200).json(val);
     } catch(err) {
@@ -24,7 +22,6 @@ module.exports = () => {
   });
   router.options('/', async (req, res) => {
     try {
-      console.log("OPTIONS /compile body=" + JSON.stringify(req.body, null, 2));
       let body = typeof req.body === "string" && JSON.parse(req.body) || req.body;
       res.set("Access-Control-Allow-Origin", "*");
       res.set("Access-Control-Request-Methods", "POST");
@@ -44,7 +41,6 @@ module.exports = () => {
       error(item, "Missing item in POST /compile.");
       error(!isNaN(parseInt(item.lang)), "Invalid language identifier in POST /compile data.");
       error(item.code, "Invalid code in POST /compile data.");
-      let t0 = new Date;
       let val = await compile(auth, item);
       let refresh = item.options && item.options.refresh;
       const statusCode = val.error && 400 || 200;

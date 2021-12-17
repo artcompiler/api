@@ -1,18 +1,21 @@
 const assert = require('assert');
 const {Router} = require('express');
-const {getTask, postTasks} = require('../task');
+const {getTasks, postTasks} = require('../task');
 const {error, statusCodeFromErrors, messageFromErrors, setMetadataBuilds} = require('../util');
 const build = require('../../build.json');
+
 module.exports = () => {
   const router = new Router();
   router.get('/', async (req, res) => {
+    // GET /task?id=id => {task}
     try {
       const auth = req.query.auth;
       const id = req.query.id;
       id = id.indexOf(',') < 0 && id || id.split(',');
       error(id !== undefined, "Missing task in GET /task.");
-      const t0 = new Date;
-      const task = await getTask(id);
+      const task = await getTasks(auth, id);
+      task = task.length === 1 && task[0] || task;
+      const val = {task: task};
       setMetadataBuilds(task, build);
       res.set("Access-Control-Allow-Origin", "*");
       res.status(200).json(task);
@@ -20,10 +23,10 @@ module.exports = () => {
       res.status(500).json(err.message);
     }
   });
+
   router.options('/', async (req, res) => {
     try {
-      console.log("OPTIONS /compile body=" + JSON.stringify(req.body, null, 2));
-      let body = typeof req.body === "string" && JSON.parse(req.body) || req.body;
+      const body = typeof req.body === "string" && JSON.parse(req.body) || req.body;
       res.set("Access-Control-Allow-Origin", "*");
       res.set("Access-Control-Request-Methods", "POST");
       res.set("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type");
@@ -34,6 +37,7 @@ module.exports = () => {
       res.statusStatus(500);
     }
   });
+
   router.post('/', async (req, res) => {
     // POST /task {task} => {id}
     try {
@@ -41,9 +45,6 @@ module.exports = () => {
       const task = body.task;
       const auth = body.auth;
       error(task, "Missing task in POST /task.");
-      // error(!isNaN(parseInt(task.lang)), "Invalid language identifier in POST /task data.");
-      // error(task.code, "Invalid code in POST /task data.");
-      const t0 = new Date;
       const id = await postTasks(auth, task);
       id = id.length === 1 && id[0] || id;
       const val = {id: id};

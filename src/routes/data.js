@@ -1,7 +1,7 @@
 const assert = require('assert');
 const {Router} = require('express');
 const {getData} = require('../data');
-const {error, statusCodeFromErrors, messageFromErrors, setMetadataBuilds} = require('../util');
+const {error, setMetadataBuilds} = require('../util');
 const build = require('../../build.json');
 
 module.exports = () => {
@@ -12,8 +12,8 @@ module.exports = () => {
       const auth = '';
       id = id.indexOf(',') < 0 && id || id.split(',');
       error(id !== undefined, "Missing task in GET /data.");
-      let t0 = new Date;
       const data = await getData(auth, id);
+      data = data.length === 1 && data[0] || data;
       const val = {data: data};
       setMetadataBuilds(val, build);
       res.status(200).json(val);
@@ -24,7 +24,6 @@ module.exports = () => {
   
   router.options('/', async (req, res) => {
     try {
-      console.log("OPTIONS /data?id=" + req.query.id);
       res.set("Access-Control-Allow-Origin", "*");
       res.set("Access-Control-Request-Methods", "POST");
       res.set("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type");
