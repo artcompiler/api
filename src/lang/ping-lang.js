@@ -3,13 +3,13 @@ export function buildPingLang({ getBaseUrlForLanguage, bent, log }) {
   const cache = new Map();
 
   async function pingLangInternal(lang) {
+    const baseUrl = getBaseUrlForLanguage(lang);
     try {
-      const baseUrl = getBaseUrlForLanguage(lang);
       const headLang = bent(baseUrl, 'HEAD');
       await headLang('/');
       return true;
     } catch (err) {
-      log(`Failed to ping language ${lang}: ${err.message}`);
+      log(`Failed to ping language ${baseUrl}: ${err.message}`);
       return false;
     }
   }

@@ -52,6 +52,8 @@ app.use((err, req, res, next) => {
 // Routes
 app.use('/', routes.root());
 app.use('/compile', routes.compile());
+app.use('/data', routes.data());
+app.use('/task', routes.task());
 app.use('/lang', routes.langRouter);
 app.use('/config', routes.configHandler);
 app.use('/L*', routes.langRouter);
