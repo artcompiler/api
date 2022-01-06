@@ -1,7 +1,5 @@
-const assert = require('assert');
-const {decodeID, encodeID, objectToID, objectFromID} = require('./id');
-const {compileID} = require('./comp');
-const nilID = encodeID([0,0,0]);
+const { decodeID, encodeID, objectToID, objectFromID } = require('./id');
+const { compileID } = require('./comp');
 
 function verifyCode(code) {
   // Return code if valid, otherwise return null.
@@ -36,7 +34,7 @@ function taskFromID(id) {
     const ids = decodeID(id);
     const lang = String(ids[0]);
     const code = objectFromID(ids[1]);
-    const task = {lang: lang, code: code};
+    const task = { lang, code };
     return task;
   } catch (err) {
     return err;
@@ -54,7 +52,7 @@ async function postTasks(auth, tasks) {
 
 async function postTask(auth, task) {
   const id = taskToID(task);
-  compileID(auth, id, {}, () => {});  // Prime the cache.
+  compileID(auth, id, {}, () => { });  // Prime the cache.
   return id;
 }
 
