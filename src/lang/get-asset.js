@@ -1,6 +1,6 @@
-export function buildGetAsset({ getBaseUrlForLanguage, bent }) {
+const buildGetAsset = ({ getBaseUrlForLanguage, bent }) => {
   const cache = new Map();
-  return async function getAsset(lang, path) {
+  return async (lang, path) => {
     const key = `${lang}.${path}`;
     try {
       if (!cache.has(key)) {
@@ -15,3 +15,4 @@ export function buildGetAsset({ getBaseUrlForLanguage, bent }) {
     }
   };
 }
+exports.buildGetAsset = buildGetAsset;

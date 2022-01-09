@@ -1,9 +1,9 @@
-const fs = require("fs");
-const {execSync} = require("child_process");
+const fs = require('fs');
+const { execSync } = require('child_process');
 
 function rmdir(path) {
   try { var files = fs.readdirSync(path); }
-  catch(e) { return; }
+  catch (e) { return; }
   if (files.length > 0) {
     for (var i = 0; i < files.length; i++) {
       var filePath = path + '/' + files[i];
@@ -13,7 +13,7 @@ function rmdir(path) {
         } else {
           rmdir(filePath);
         }
-      } catch(err) {
+      } catch (err) {
         console.log(`Failed to unlink ${filePath}: ${err.message}`);
       }
     }
@@ -36,8 +36,8 @@ function exec(cmd, args) {
 }
 
 function clean() {
-  console.log("Cleaning...");
-  cldir("./build");
+  console.log('Cleaning...');
+  cldir('./build');
 }
 
 function compile() {
@@ -46,17 +46,23 @@ function compile() {
 }
 
 function bundle() {
-  console.log("Bundling...");
+  console.log('Bundling...');
   exec('cp -r ./config ./build/config');
   exec('cp build.json ./build');
 }
 
-function build() {
+const build = async () => {
   let t0 = Date.now();
-  clean();
-  compile();
-  bundle();
-  console.log("Build completed in " + (Date.now() - t0) + " ms");
+  try {
+    await clean();
+    await compile();
+    await bundle();
+    console.log('Build completed in ' + (Date.now() - t0) + ' ms');
+  } catch (err) {
+    console.log(`Build failed in ${Date.now() - t0}ms with error: ${err.messsage}`);
+    console.log(err.stdout.toString());
+    throw err;
+  }
 }
 
 function prebuild() {
@@ -65,7 +71,7 @@ function prebuild() {
     'name': 'api',
     'commit': commit,
   };
-  fs.writeFile('build.json', JSON.stringify(build, null, 2), () => {});
+  fs.writeFile('build.json', JSON.stringify(build, null, 2), () => { });
 }
 
 if (process.argv.includes('--build-dev')) {

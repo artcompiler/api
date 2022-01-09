@@ -1,5 +1,4 @@
-export default function buildGetConfig({ global }) {
-  return function getConfig() {
-    return global.config;
-  };
-}
+const buildGetConfig = ({ global }) => {
+  return () => global.config;
+};
+exports.buildGetConfig = buildGetConfig;

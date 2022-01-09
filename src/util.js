@@ -2,12 +2,12 @@ const DEBUG = process.env.GRAFFITICODE_DEBUG === 'true' || false;
 const assert = (function assert() {
   // If 'DEBUG' is false then 'assert' is a no-op.
   return !DEBUG ?
-    () => {} :
+    () => { } :
     (test, str) => {
       if (str === undefined) {
         str = "failed!";
       }
-      if ( !val ) {
+      if (!val) {
         let err = new Error(str);
         throw err;
       }
@@ -39,7 +39,7 @@ function reserveCodeRange(first, last, moduleName) {
     return last < range.first || first > range.last;
   });
   assert(noConflict, "Conflicting request for error code range");
-  reservedCodes.push({first: first, last: last, name: moduleName});
+  reservedCodes.push({ first: first, last: last, name: moduleName });
 }
 
 function parseJSON(str) {
@@ -91,19 +91,19 @@ function getCompilerPort(lang, config) {
 }
 
 function isNonEmptyString(str) {
-  return ('string' === typeof(str) && 0 < str.length);
+  return ('string' === typeof (str) && 0 < str.length);
 }
 
 function cleanAndTrimObj(str) {
   if (!str) {
     return str;
   }
-  str = str.replace(new RegExp("'","g"), "''");
-  str = str.replace(new RegExp("\n","g"), " ");
-  while(str.charAt(0) === " ") {
+  str = str.replace(new RegExp("'", "g"), "''");
+  str = str.replace(new RegExp("\n", "g"), " ");
+  while (str.charAt(0) === " ") {
     str = str.substring(1);
   }
-  while(str.charAt(str.length - 1) === " ") {
+  while (str.charAt(str.length - 1) === " ") {
     str = str.substring(0, str.length - 1);
   }
   return str;
@@ -113,11 +113,11 @@ function cleanAndTrimSrc(str) {
   if (!str || typeof str !== "string") {
     return str;
   }
-  str = str.replace(new RegExp("'","g"), "''");
-  while(str.charAt(0) === " ") {
+  str = str.replace(new RegExp("'", "g"), "''");
+  while (str.charAt(0) === " ") {
     str = str.substring(1);
   }
-  while(str.charAt(str.length - 1) === " ") {
+  while (str.charAt(str.length - 1) === " ") {
     str = str.substring(0, str.length - 1);
   }
   return str;
@@ -126,7 +126,7 @@ function cleanAndTrimSrc(str) {
 // From http://javascript.about.com/library/blipconvert.htm
 function dot2num(dot) {
   var d = dot.split('.');
-  var n = ((((((+d[0])*256)+(+d[1]))*256)+(+d[2]))*256)+(+d[3]);
+  var n = ((((((+d[0]) * 256) + (+d[1])) * 256) + (+d[2])) * 256) + (+d[3]);
   if (isNaN(n)) {
     return 0;
   }
@@ -134,10 +134,11 @@ function dot2num(dot) {
 }
 
 function num2dot(num) {
-  var d = num%256;
+  var d = num % 256;
   for (var i = 3; i > 0; i--) {
-    num = Math.floor(num/256);
-    d = num%256 + '.' + d;}
+    num = Math.floor(num / 256);
+    d = num % 256 + '.' + d;
+  }
   return d;
 }
 
@@ -169,7 +170,7 @@ const INTERNAL_ERROR = {
   error: "Internal error",
 };
 function internalError(error) {
-  return Object.assign(INTERNAL_ERROR, {error});
+  return Object.assign(INTERNAL_ERROR, { error });
 }
 
 exports.getCompilerHost = getCompilerHost;

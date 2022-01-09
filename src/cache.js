@@ -1,75 +1,65 @@
-const cache = null; // = redis.createClient(process.env.REDIS_URL);
-const DEBUG = process.env.DEBUG_GRAFFITICODE === 'true' || false;
+const redis = require('redis');
 
-const localCache = new Map();
-const dontCache = ["L124"];
+const createKey = (id, type) => `${id}.${type}`;
 
-function logMapElements(value, key, map) {
-  console.log(key);
+const buildLocalCacheGet = ({ localCache, delegate }) => async (id, type) => {
+  const key = createKey(id, type);
+  if (localCache.has(key)) {
+    return localCache.get(key);
+  }
+  if (delegate) {
+    return await delegate.get(id, type);
+  }
+  return null;
 }
 
-function dumpCache() {
-  localCache.forEach(logMapElements);
+const buildLocalCacheSet = ({ localCache, delegate }) => async (id, type, value) => {
+  const key = createKey(id, type);
+  localCache.set(key, value);
+  if (delegate) {
+    await delegate.set(id, type, value);
+  }
 }
 
-function delCache (id, type) {
-  let key = id + "." + type;
+const buildLocalCacheDel = ({ localCache, delegate }) => async (id, type) => {
+  const key = createKey(id, type);
   localCache.delete(key);
-  if (cache) {
-    cache.del(key);
+  if (delegate) {
+    await delegate.set(id, type);
   }
 }
 
-const MAX_SIZE = 4000;
-const FLUSH_SIZE = Math.floor(MAX_SIZE * .25)
-function resizeLocalCache () {
-  let size = localCache.size;
-  let keys = localCache.keys();
-  for (; size > MAX_SIZE - FLUSH_SIZE; size--) {
-    let key = keys.next().value;
-    console.log("Deleting key " + key);
-    localCache.delete(key);
-  }
+const buildLocalCache = ({ delegate }) => {
+  const localCache = new Map();
+  const get = buildLocalCacheGet({ localCache, delegate });
+  const set = buildLocalCacheSet({ localCache, delegate });
+  const del = buildLocalCacheDel({ localCache, delegate });
+  return { get, set, del };
+};
+
+const buildRedisCacheGet = ({ client }) => async (id, type) => {
+  const key = createKey(id, type);
+  return await client.get(key);
 }
 
-function getCache (id, type, resume) {
-  let key = id + "." + type;
-  let val;
-  if ((val = localCache.get(key))) {
-    resume(null, val);
-  } else if (cache) {
-    cache.get(key, (err, val) => {
-      resume(null, type === "data" ? parseJSON(val) : val);
-    });
-  } else {
-    resume(null, null);
-  }
+const buildRedisCacheSet = ({ client }) => async (id, type, value) => {
+  const key = createKey(id, type);
+  await client.set(key, value);
 }
 
-function setCache (lang, id, type, val) {
-  if (!DEBUG && !dontCache.includes(lang)) {
-    if (localCache.size >= MAX_SIZE) {
-      resizeLocalCache();
-    }
-    let key = id + "." + type;
-    localCache.set(key, val);
-    if (cache) {
-      cache.set(key, type === "data" ? JSON.stringify(val) : val);
-    }
-  }
+const buildRedisCacheDel = ({ client }) => async (id, type) => {
+  const key = createKey(id, type);
+  await client.del(key);
 }
 
-function renCache (id, oldType, newType) {
-  let oldKey = id + oldType;
-  let newKey = id + newType;
-  localCache[newKey] = localCache[oldKey];
-  delete localCache[oldKey];
-  if (cache) {
-    cache.rename(oldKey, newKey);
-  }
-}
+const buildRedisCache = ({ }) => {
+  const client = redis.createClient({ url: process.env.REDIS_URL });
+  const get = buildRedisCacheGet({ client });
+  const set = buildRedisCacheSet({ client });
+  const del = buildRedisCacheDel({ client });
+  return { get, set, del };
+};
 
-exports.delCache = delCache;
-exports.getCache = getCache;
-exports.setCache = setCache;
-exports.renCache = renCache;
+exports.buildLocalCache = buildLocalCache;
+exports.buildRedisCache = buildRedisCache;
+exports.cacheApi = buildLocalCache({});

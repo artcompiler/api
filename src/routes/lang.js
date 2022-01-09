@@ -1,4 +1,4 @@
-function getLangIdFromRequest(req) {
+const getLangIdFromRequest = (req) => {
   const [, base] = req.baseUrl.split('/');
   let id = Number.parseInt(req.query.id);
   if (base === 'lang' && Number.isInteger(id)) {
@@ -20,7 +20,7 @@ function getLangIdFromRequest(req) {
   return id;
 }
 
-export function buildLangRouter({ newRouter, pingLang, getAsset, isNonEmptyString }) {
+const buildLangRouter = ({ newRouter, pingLang, getAsset, isNonEmptyString }) => {
   const router = newRouter();
   router.get('/', async (req, res, next) => {
     try {
@@ -36,9 +36,10 @@ export function buildLangRouter({ newRouter, pingLang, getAsset, isNonEmptyStrin
       } else {
         res.sendStatus(200);
       }
-    } catch(err) {
+    } catch (err) {
       next(err);
     }
   });
   return router;
-}
+};
+exports.buildLangRouter = buildLangRouter;

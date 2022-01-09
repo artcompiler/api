@@ -1,8 +1,4 @@
-import bent from 'bent';
-import express from 'express';
-import http from 'http';
-
-import { buildCompile } from '../compile.js';
+const { buildCompile } = require('./compile.js');
 
 describe('compile', () => {
   it('should return language response', async () => {

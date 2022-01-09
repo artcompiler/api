@@ -1,5 +1,4 @@
-export default function buildConfigHandler({ getConfig }) {
-  return function configHandler(req, res) {
-    res.status(200).json(getConfig());
-  };
-}
+const buildConfigHandler = ({ getConfig }) => (req, res) => {
+  res.status(200).json(getConfig());
+};
+exports.buildConfigHandler = buildConfigHandler;

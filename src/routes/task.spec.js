@@ -1,60 +1,41 @@
 const request = require('supertest');
-const app = require('../app');
+const { createApp } = require('../app');
+const { TASK1, TASK2, TASK_ID1, TASK_ID2 } = require('../testing/fixture');
+const { createSuccessResponse, createErrorResponse } = require('./utils');
+
 describe('/task endpoint', () => {
-  const task = {
-    lang: "0",
-    code: {
-      "1": { "tag": "STR", "elts": ["hello, world!"] },
-      "2": { "tag": "EXPRS", "elts": [1] },
-      "3": { "tag": "PROG", "elts": [2] },
-      "root": 3,
-      "version": "1"
-    }
-  };
-  const task2 = {
-    lang: "0",
-    code: {
-      "1": { "tag": "STR", "elts": ["goodbye, world!"] },
-      "2": { "tag": "EXPRS", "elts": [1] },
-      "3": { "tag": "PROG", "elts": [2] },
-      "root": 3,
-      "version": "1"
-    }
-  };
-  const taskID = 'yLimC0';
-  const taskID2 = 'WaiqIp';
-  it('POST /task', (done) => {
-    request(app)
+  let app;
+  beforeEach(() => {
+    app = createApp();
+  });
+
+  it('POST /task', async () => {
+    await request(app)
       .post('/task')
-      .send({ task: task })
-      .expect((res) => {
-        delete res.body._;
-      })
-      .expect(200, { id: taskID }, done);
+      .send({ task: TASK1 })
+      .expect(200, createSuccessResponse({ id: TASK_ID1 }));
   });
-  it('GET /task', (done) => {
-    request(app)
-      .get('/task?id=' + taskID)
-      .expect((res) => {
-        delete res.body._;
-      })
-      .expect(200, task, done);
+
+  it('GET /task no ids', async () => {
+    await request(app)
+      .get(`/task`)
+      .expect(400, createErrorResponse('must provide at least one id'));
   });
-  it('POST /task', (done) => {
-    request(app)
-      .post('/task')
-      .send({ task: [task, task2] })
-      .expect((res) => {
-        delete res.body._;
-      })
-      .expect(200, { id: [taskID, taskID2] }, done);
+
+  it('GET /task', async () => {
+    await request(app).post('/task').send({ task: TASK1 });
+
+    await request(app)
+      .get(`/task?id=${[TASK_ID1].join(',')}`)
+      .expect(200, createSuccessResponse([TASK1]));
   });
-  it('GET /task?id=[]', (done) => {
-    request(app)
-      .get('/task?id=' + [taskID, taskID2])
-      .expect((res) => {
-        delete res.body._;
-      })
-      .expect(200, [task, task2], done);
+
+  it('GET /task?id=[]', async () => {
+    await request(app).post('/task').send({ task: TASK1 });
+    await request(app).post('/task').send({ task: TASK2 });
+
+    await request(app)
+      .get(`/task?id=${[TASK_ID1, TASK_ID2].join(',')}`)
+      .expect(200, createSuccessResponse([TASK1, TASK2]));
   });
 });

@@ -1,4 +1,4 @@
-import buildProxyHandler from '../proxy.js';
+const { buildProxyHandler } = require('./proxy.js');
 
 describe('routes', () => {
   describe('proxy', () => {

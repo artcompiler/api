@@ -1,7 +1,3 @@
-import buildGetConfig from './config';
+const {buildGetConfig} = require('./config');
 
-const getConfig = buildGetConfig({ global });
-
-export {
-  getConfig
-};
+exports.getConfig = buildGetConfig({ global });

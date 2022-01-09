@@ -1,143 +1,77 @@
-const assert = require('assert');
-const {decodeID, encodeID, objectToID, objectFromID} = require('./id');
-const {delCache, getCache, setCache} = require('./cache');
-import {compile as langCompile, pingLang}  from './lang';
-const {internalError} = require('./util');
+const { decodeID, encodeID } = require('./id');
 
-const nilID = encodeID([0,0,0]);
+const nilID = encodeID([0, 0, 0]);
 
-function getLang(ids, resume) {
-  resume(null, "L" + ids[0]);
-}
+const getLang = ids => `L${ids[0]}`;
 
-function getCode(ids, resume) {
-  const val = objectFromID(ids[1]);
-  resume(null, val);
-}
+const buildGetCode = ({ taskDaoFactory }) => async (ids) => {
+  const taskDao = taskDaoFactory.create();
 
-function getData(ids, resume) {
-  if (encodeID(ids) === nilID || ids.length === 3 && +ids[2] === 0) {
-    resume(null, {});
-  } else {
-    ids = ids.slice(2);
-    assert(ids.length === 3);
-    assert(ids[0] === 113);   // L113 code is stored as data not an AST.
-    const val = objectFromID(ids[1]);
-    resume(null, val);
+  const [langId, codeId] = ids;
+  const taskId = encodeID([langId, codeId, 0]);
+
+  const task = await taskDao.findById(taskId);
+
+  return task.code;
+};
+
+const buildGetData = ({ taskDaoFactory }) => async (ids) => {
+  if (encodeID(ids) === nilID) {
+    return {};
   }
-}
 
-function compileID(auth, id, options, resume) {
-  let refresh = options.refresh;
-  let dontSave = options.dontSave;
-  if (id === nilID) {
-    resume(null, {});
-  } else {
-    let ids = decodeID(id);
+  if (ids.length === 3 && ids[2] === 0) {
+    return {};
+  }
+
+  const dataIds = ids.slice(2);
+  if (dataIds.length !== 3) {
+    throw new Error(`expected dataIds to have length 3, got ${data} `)
+  }
+
+  const [dataLangId, dataCodeId] = dataIds;
+  if (dataLangId !== 113) {
+    throw new Error(`expected data langId to be 113, but got ${dataLangId}`);
+  }
+
+  const taskDao = taskDaoFactory.create();
+  const taskId = encodeID([dataLangId, dataCodeId, 0]);
+  const task = await taskDao.findById(taskId);
+  return task.code;
+};
+
+const buildCompileId = ({ taskDaoFactory, cache, langCompile }) => {
+  const getCode = buildGetCode({ taskDaoFactory });
+  const getData = buildGetData({ taskDaoFactory });
+  return async (auth, id, options) => {
+    const { refresh = false, dontSave = false } = options || {};
+
+    if (id === nilID) {
+      const data = {};
+      return data;
+    }
+
     if (refresh) {
-      delCache(id, "data");
+      await cache.del(id, 'data');
     }
-    getCache(id, "data", (err, val) => {
-      if (val) {
-        // Got cached value. We're done.
-        resume(err, val);
-      } else {
-        getData(ids, (err, data) => {
-          if (err && err.length) {
-            resume(err, null);
-          } else {
-            getCode(ids, (err, code) => {
-              if (err && err.length) {
-                resume(err, null);
-              } else {
-                getLang(ids, (err, lang) => {
-                  if (err && err.length) {
-                    resume(err, null);
-                  } else {
-                    if (code && code.root) {
-                      assert(code && code.root !== undefined, "Invalid code for item " + ids[1]);
-                      // Let downstream compilers know they need to refresh
-                      // any data used.
-                      comp(auth, lang, code, data, options, (err, obj) => {
-                        if (err) {
-                          resume(err);
-                        } else {
-                          // TODO cache id => obj.
-                          setCache(lang, id, "data", obj);
-                          resume(null, obj);
-                        }
-                      });
-                    } else {
-                      // Error handling here.
-                      console.log("ERROR compileID() ids=" + ids + " missing code");
-                      resume(null, {});
-                    }
-                  }
-                });
-              }
-            });
-          }
-        });
-      }
-    });
-  }
-}
 
-async function comp(auth, lang, code, data, options, resume) {
-  try {
-    const pong = await pingLang(lang);
-    if (!pong) {
-      resume([internalError()]);
-    } else {
-      const req = { code, data, options, auth };
-      const res = await langCompile(lang, req);
-      resume(null, res);
+    let obj = await cache.get(id, 'data');
+    if (obj) {
+      return obj;
     }
-  } catch(err) {
-    resume(err);
-  }
-}
 
-function verifyCode(code) {
-  // Return code if valid, otherwise return null.
-  if (code.root) {
-    return code;
-  } else if (typeof code === 'string') {
-    return parse(lang, src);
-  } else {
-    return null;
-  }
-}
+    const ids = decodeID(id);
+    let [lang, code, data] = await Promise.all([
+      getLang(ids), getCode(ids), getData(ids)
+    ]);
+    obj = await langCompile(lang, { auth, code, data, options });
 
-function compile(auth, item) {
-  // item = {
-  //   lang,
-  //   code,
-  //   data,
-  //   options,
-  // }
-  // where
-  //   lang is an integer language identifier,
-  //   code is an AST which may or may not be in the AST store, and
-  //   data is a JSON object to be passed with the code to the compiler.
-  //   options is an object defining various contextual values.
-  return new Promise(async (accept, reject) => {
-    let langID = item.lang;
-    let codeID = await objectToID(verifyCode(item.code));
-    let dataID = await objectToID(item.data);
-    let dataIDs = dataID === 0 && [0] || [113, dataID, 0];  // L113 is the data language.
-    let id = encodeID([langID, codeID].concat(dataIDs));
-    let options = item.options || {};
-    let t0 = new Date;
-    compileID(auth, id, options, (err, obj) => {
-      if (err) {
-        reject(err);
-      } else {
-        accept(obj);
-      }
-    });
-  });
-}
+    if (!dontSave) {
+      await cache.set(id, 'data');
+    }
 
-exports.compileID = compileID;
-exports.compile = compile;
+    return obj;
+  };
+};
+
+exports.buildCompileId = buildCompileId;
