@@ -2,11 +2,10 @@ default: build
 	npm start
 
 test:
-	npm run test
+	npm test
 
 build:
-	npm run build-dev
-	npm run build
+	npm run build --if-present
 
 dev:
 	npm run dev

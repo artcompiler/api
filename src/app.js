@@ -53,7 +53,6 @@ const createApp = () => {
   }
   app.use(express.json({ limit: '50mb' }));
   app.use(methodOverride());
-  app.use(routes.proxyHandler);
 
   // Routes
   app.use('/', routes.root());
