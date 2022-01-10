@@ -1,26 +1,9 @@
-const assert = require('assert');
-const {compileID} = require('./comp');
+const buildGetDatum = ({ compileId }) => (auth, id, options) => compileId(auth, id, options);
+const buildGetData = ({ getDatum }) => (auth, ids, options) => Promise.all(ids.map(id => getDatum(auth, id, options)));
 
-
-async function getData(auth, ids) {
-  if (!(ids instanceof Array)) {
-    ids = [ids];
-  }
-  return Promise.all(ids.map(async (id) => {
-    return await getDatum(auth, id);
-  }));
-}
-
-async function getDatum(auth, id) {
-  return new Promise((accept, reject) => {
-    compileID(auth, id, {}, (err, obj) => {
-      if (err) {
-        reject(err);
-      } else {
-        accept(obj);
-      }
-    });
-  });
-}
-
-exports.getData = getData;
+const buildDataApi = ({ compileId }) => {
+  const getDatum = buildGetDatum({ compileId });
+  const getData = buildGetData({ getDatum });
+  return { get: getData };
+};
+exports.buildDataApi = buildDataApi;

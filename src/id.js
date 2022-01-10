@@ -1,6 +1,5 @@
 const assert = require('assert');
 const Hashids = require('hashids');
-const {cleanAndTrimSrc} = require('./util');
 
 const hashids = new Hashids('Art Compiler LLC');  // This string shall never change!
 
@@ -57,10 +56,10 @@ function encodeID(ids) {
   // console.log('[1] encodeID() >> ' + JSON.stringify(ids));
   let length = ids.length;
   if (length >= 3 &&
-      // [0,0,0] --> '0'
-      +ids[length - 3] === 0 &&
-      +ids[length - 2] === 0 &&
-      +ids[length - 1] === 0) {
+    // [0,0,0] --> '0'
+    +ids[length - 3] === 0 &&
+    +ids[length - 2] === 0 &&
+    +ids[length - 1] === 0) {
     ids = ids.slice(0, length - 2);
     length = ids.length;
   }
@@ -77,35 +76,5 @@ function encodeID(ids) {
   return id;
 }
 
-function dumpMap(map) {
-  map.forEach((val, key) => {
-    console.log(JSON.stringify(key) + " => " + JSON.stringify(val));
-  });
-}
-
-const objIDMap = new Map([[JSON.stringify({}), 1]]);
-const idObjMap = new Map([[1, {}]]);
-function objectToID(obj) {
-  let id;
-  if (obj === null) {
-    id = 0;
-  } else {
-    if (!objIDMap.has(JSON.stringify(obj))) {
-      let id = idObjMap.size + 1;
-      objIDMap.set(JSON.stringify(obj), id);
-      idObjMap.set(id, obj);
-    }
-    id = objIDMap.get(JSON.stringify(obj));
-  }
-  return id;
-}
-
-function objectFromID(id) {
-  // dumpMap(idObjMap);
-  return idObjMap.get(id);
-}
-
 module.exports.decodeID = decodeID;
 module.exports.encodeID = encodeID;
-module.exports.objectToID = objectToID;
-module.exports.objectFromID = objectFromID;

@@ -1,35 +1,11 @@
-const { expect } = require('chai');
-const { decodeID, encodeID, objectToID, objectFromID } = require('./../src/id');
+const { decodeID, encodeID } = require('./id');
+
 describe('id', () => {
-  describe('objectToID', () => {
-    it('should return 1 when given {}', async () => {
-      expect(
-        await objectToID({})
-      ).to.equal(1)
-    })
-  });
-  describe('objectFromID', () => {
-    it('getting ID for code {}', async () => {
-      expect(
-        await objectFromID(1)
-      ).to.eql({})
-    })
-    it.skip('getting code for ID=2', async () => {
-      expect(
-        await objectFromID(2)
-      ).to.eql({
-        "1":{"tag":"STR","elts":["hello, world!"]},
-        "2":{"tag":"EXPRS","elts":[1]},
-        "3":{"tag":"PROG","elts":[2]},
-        "root":3,
-        "version":"1"})
-    })
-  });
   describe('decodeID', () => {
-    function expectIds(ids, ...params) {
-      expect(ids).to.have.length(params.length);
+    const expectIds = (ids, ...params) => {
+      expect(ids).toHaveLength(params.length);
       for (let i = 0; i < ids.length; i++) {
-        expect(ids[i]).to.equal(params[i]);
+        expect(ids[i]).toBe(params[i]);
       }
     }
     it('should return 0 when no ID', () => {
@@ -64,19 +40,19 @@ describe('id', () => {
   describe('encodeID', () => {
     it('should encode single ID', () => {
       const encoded = encodeID([42]);
-      expect(encoded).to.equal('z3iqiO');
+      expect(encoded).toBe('z3iqiO');
     });
     it('should encode single zero ID', () => {
       const encoded = encodeID([0]);
-      expect(encoded).to.equal('0');
+      expect(encoded).toBe('0');
     });
     it('should encode legacy ID', () => {
       const encoded = encodeID([42, 13]);
-      expect(encoded).to.equal('J0iKiRaHOcp');
+      expect(encoded).toBe('J0iKiRaHOcp');
     });
     it('should encode with trailing zeros', () => {
       const encoded = encodeID([42, 0, 0, 0,]);
-      expect(encoded).to.equal('QOiVi4OsOi7');
+      expect(encoded).toBe('QOiVi4OsOi7');
     });
   });
 });

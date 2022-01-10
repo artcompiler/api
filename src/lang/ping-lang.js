@@ -1,8 +1,9 @@
-function noop() { }
-export function buildPingLang({ getBaseUrlForLanguage, bent, log }) {
+const noop = _ => { };
+
+const buildPingLang = ({ getBaseUrlForLanguage, bent, log }) => {
   const cache = new Map();
 
-  async function pingLangInternal(lang) {
+  const pingLangInternal = async (lang) => {
     const baseUrl = getBaseUrlForLanguage(lang);
     try {
       const headLang = bent(baseUrl, 'HEAD');
@@ -12,9 +13,9 @@ export function buildPingLang({ getBaseUrlForLanguage, bent, log }) {
       log(`Failed to ping language ${baseUrl}: ${err.message}`);
       return false;
     }
-  }
+  };
 
-  return async function pingLang(lang, resume) {
+  return async (lang, resume) => {
     if (typeof resume !== 'function') {
       resume = noop;
     }
@@ -30,4 +31,5 @@ export function buildPingLang({ getBaseUrlForLanguage, bent, log }) {
     resume(pong);
     return pong;
   };
-}
+};
+exports.buildPingLang = buildPingLang;

@@ -1,7 +1,12 @@
 const request = require('supertest');
-const { expect } = require('chai');
-const app = require('./../src/app');
+const { createApp } = require('./app');
+
 describe('api', () => {
+  let app;
+  beforeEach(() => {
+    app = createApp();
+  });
+
   it('GET /', (done) => {
     request(app)
       .get('/')

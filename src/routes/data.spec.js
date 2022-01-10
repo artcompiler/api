@@ -1,62 +1,28 @@
 const request = require('supertest');
-const { expect } = require('chai');
-const app = require('../app');
-describe('/task endpoint', () => {
-  const task = {
-    lang: "0",
-    code: {
-      "1":{"tag":"STR","elts":["hello, world!"]},
-      "2":{"tag":"EXPRS","elts":[1]},
-      "3":{"tag":"PROG","elts":[2]},
-      "root":3,
-      "version":"1"}
-  };
-  const task2 = {
-    lang: "0",
-    code: {
-      "1":{"tag":"STR","elts":["goodbye, world!"]},
-      "2":{"tag":"EXPRS","elts":[1]},
-      "3":{"tag":"PROG","elts":[2]},
-      "root":3,
-      "version":"1"}
-  };
-  const taskID = 'yLimC0';
-  const taskID2 = 'WaiqIp';
-  const data = 'hello, world!';
-  const data2 = 'goodbye, world!';
-  
-  it('POST /task', (done) => {
-    request(app)
-      .post('/task')
-      .send({task: task})
-      .expect((res) => {
-        delete res.body._;
-      })
-      .expect(200, {id: taskID}, done);
+const { createApp } = require('../app');
+const { TASK1, TASK_ID1, DATA1, DATA2, TASK_ID2, TASK2 } = require('../testing/fixture');
+const { createSuccessResponse } = require('./utils');
+
+describe('/data endpoint', () => {
+  let app;
+  beforeEach(() => {
+    app = createApp();
   });
-  it('GET /data', (done) => {
-    request(app)
-      .get('/data?id=' + taskID)
-      .expect((res) => {
-        delete res.body._;
-      })
-      .expect(200, {data: data}, done);
+
+  it('get single data', async () => {
+    await request(app).post('/task').send({ task: TASK1 });
+
+    await request(app)
+      .get(`/data?id=${[TASK_ID1].join(',')}`)
+      .expect(200, createSuccessResponse([DATA1]));
   });
-  it('POST /task', (done) => {
-    request(app)
-      .post('/task')
-      .send({task: [task, task2]})
-      .expect((res) => {
-        delete res.body._;
-      })
-      .expect(200, {id: [taskID, taskID2]}, done);
-  });
-  it('GET /data?id=[]', (done) => {
-    request(app)
-      .get('/data?id=' + [taskID, taskID2])
-      .expect((res) => {
-        delete res.body._;
-      })
-      .expect(200, {data: [data, data2]}, done);
+
+  it('get multiple datas', async () => {
+    await request(app).post('/task').send({ task: TASK1 });
+    await request(app).post('/task').send({ task: TASK2 });
+
+    await request(app)
+      .get(`/data?id=${[TASK_ID1, TASK_ID2].join(',')}`)
+      .expect(200, createSuccessResponse([DATA1, DATA2]));
   });
 });

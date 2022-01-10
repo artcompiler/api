@@ -1,57 +1,38 @@
-const { expect } = require('chai');
-const { postTasks } = require('./task');
-const { getData } = require('./data');
-const auth = null;
+const { buildDataApi } = require('./data');
+const { TASK_ID1, DATA1, TASK_ID2, DATA2 } = require('./testing/fixture');
+
 describe('data', () => {
-  const task = {
-    lang: "0",
-    code: {
-      "1":{"tag":"STR","elts":["hello, world!"]},
-      "2":{"tag":"EXPRS","elts":[1]},
-      "3":{"tag":"PROG","elts":[2]},
-      "root":3,
-      "version":"1"}
-  };
-  const task2 = {
-    lang: "0",
-    code: {
-      "1":{"tag":"STR","elts":["goodbye, world!"]},
-      "2":{"tag":"EXPRS","elts":[1]},
-      "3":{"tag":"PROG","elts":[2]},
-      "root":3,
-      "version":"1"}
-  };
-  const taskID = 'yLimC0';
-  const taskID2 = 'WaiqIp';
-  const data = 'hello, world!';
-  const data2 = 'goodbye, world!';
-  
-  describe('postTasks task', () => {
-    it('mapping a task to an ID', async () => {
-      expect(
-        await postTasks(auth, task)
-      ).to.eql([taskID]);
-    });
+  let compileId;
+  let dataApi;
+  beforeEach(() => {
+    compileId = jest.fn();
+    dataApi = buildDataApi({ compileId });
   });
-  describe('getData ID', () => {
-    it('mapping a task to data', async () => {
-      expect(
-        await getData(auth, taskID)
-      ).to.eql([data]);
-    });
+
+  const mockCompileIdData = data =>
+    compileId.mockResolvedValueOnce(data);
+
+  it('should compile a created task', async () => {
+    const auth = 'abc';
+    mockCompileIdData(DATA1);
+    const options = null;
+
+    await expect(dataApi.get(auth, [TASK_ID1], options)).resolves.toStrictEqual([DATA1]);
+
+    expect(compileId).toHaveBeenCalledTimes(1);
+    expect(compileId).toHaveBeenNthCalledWith(1, auth, TASK_ID1, null);
   });
-  describe('postTasks [task*]', () => {
-    it('mapping tasks to an IDs', async () => {
-      expect(
-        await postTasks(auth, [task, task2])
-      ).to.eql([taskID, taskID2]);
-    });
-  });
-  describe('getData [ID*]', () => {
-    it('mapping IDs to data', async () => {
-      expect(
-        await getData(auth, [taskID, taskID2])
-      ).to.eql([data, data2]);
-    });
+
+  it('should compile created tasks', async () => {
+    const auth = 'abc';
+    mockCompileIdData(DATA1);
+    mockCompileIdData(DATA2);
+    const options = null;
+
+    await expect(dataApi.get(auth, [TASK_ID1, TASK_ID2], options)).resolves.toStrictEqual([DATA1, DATA2]);
+
+    expect(compileId).toHaveBeenCalledTimes(2);
+    expect(compileId).toHaveBeenNthCalledWith(1, auth, TASK_ID1, null);
+    expect(compileId).toHaveBeenNthCalledWith(2, auth, TASK_ID2, null);
   });
 });

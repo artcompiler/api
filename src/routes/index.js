@@ -1,23 +1,15 @@
-import { Router } from 'express';
-import http from 'http';
-import https from 'https';
-import fetch from 'node-fetch';
-import uuid from 'uuid';
+const { Router } = require('express');
 
-import { getConfig } from './../config';
-import { pingLang, getAsset } from './../lang';
-import { isNonEmptyString } from './../util';
+const { getConfig } = require('./../config');
+const { pingLang, getAsset } = require('./../lang');
+const { isNonEmptyString } = require('./../util');
 
-import data from './data';
-import task from './task';
-import compile from './compile';
-import buildConfigHandler from './config';
-import { buildLangRouter } from './lang';
-import buildProxyHandler from './proxy';
-import root from './root';
-
-const httpAgent = new http.Agent({ keepAlive: true });
-const httpsAgent = new https.Agent({ keepAlive: true });
+const data = require('./data');
+const task = require('./task');
+const compile = require('./compile');
+const { buildConfigHandler } = require('./config');
+const { buildLangRouter } = require('./lang');
+const root = require('./root');
 
 const configHandler = buildConfigHandler({ getConfig });
 const langRouter = buildLangRouter({
@@ -27,21 +19,10 @@ const langRouter = buildLangRouter({
   getAsset,
 });
 
-const proxyHandler = buildProxyHandler({
-  httpAgent,
-  httpsAgent,
-  log: console.log,
-  getConfig,
-  fetch,
-  uuid,
-});
+exports.data = data;
+exports.task = task;
+exports.compile = compile;
+exports.langRouter = langRouter;
+exports.configHandler = configHandler;
+exports.root = root;
 
-export {
-  data,
-  task,
-  compile,
-  langRouter,
-  configHandler,
-  proxyHandler,
-  root,
-}
