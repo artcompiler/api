@@ -11,16 +11,14 @@ describe('/data endpoint', () => {
 
   it('get single data', async () => {
     await request(app).post('/task').send({ task: TASK1 });
-
     await request(app)
       .get(`/data?id=${[TASK_ID1].join(',')}`)
-      .expect(200, createSuccessResponse([DATA1]));
+      .expect(200, createSuccessResponse(DATA1));
   });
 
   it('get multiple datas', async () => {
     await request(app).post('/task').send({ task: TASK1 });
     await request(app).post('/task').send({ task: TASK2 });
-
     await request(app)
       .get(`/data?id=${[TASK_ID1, TASK_ID2].join(',')}`)
       .expect(200, createSuccessResponse([DATA1, DATA2]));
