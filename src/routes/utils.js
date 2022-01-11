@@ -20,13 +20,15 @@ exports.parseAuthFromRequest = req => {
   return null;
 };
 
-exports.buildHttpHandler = handler => async (req, res, next) => {
+const buildHttpHandler = handler => async (req, res, next) => {
   try {
     await handler(req, res, next);
   } catch (err) {
     next(err);
   }
 };
+
+exports.buildHttpHandler = buildHttpHandler;
 
 const createError = (code, message) => ({ code, message });
 
@@ -40,4 +42,12 @@ exports.createSuccessResponse = data => ({
   status: 'success',
   error: null,
   data,
+});
+
+exports.optionsHandler = buildHttpHandler(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Request-Methods", "GET POST");
+  res.set("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type");
+  res.set("Connection", "Keep-Alive");
+  res.sendStatus(204);
 });
