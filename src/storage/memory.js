@@ -17,6 +17,16 @@ const buildObjectToId = ({ idsByObject, objectsById }) => obj => {
 
 const buildObjectFromId = ({ objectsById }) => id => objectsById.get(id);
 
+const buildTasksCreate = ({ objectToId }) => async (tasks) => {
+  const taskCreate = buildTaskCreate({ objectToId });
+  if (!(tasks instanceof Array)) {
+    tasks = [tasks];
+  }
+  return Promise.all(tasks.map((task) => {
+    return taskCreate(task);
+  }));
+};
+
 const buildTaskCreate = ({ objectToId }) => async (task) => {
   const langId = task.lang;
   const codeId = objectToId(task.code);
@@ -42,8 +52,8 @@ const buildMemoryTaskDao = () => {
   const objectToId = buildObjectToId({ idsByObject, objectsById });
   const objectFromId = buildObjectFromId({ objectsById });
 
-  const create = buildTaskCreate({ objectToId });
+  const create = buildTasksCreate({ objectToId });
   const findById = buildTaskFindById({ objectFromId });
-  return { create, findById }
+  return { create, findById };
 };
 exports.buildMemoryTaskDao = buildMemoryTaskDao;

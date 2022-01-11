@@ -4,6 +4,7 @@ const buildCreate = ({ cache }) => ({ type = 'memory' } = {}) => {
     let taskDao;
     if (type === 'memory') {
       const { buildMemoryTaskDao } = require('./memory');
+      // FIXME handle array of tasks here.
       taskDao = buildMemoryTaskDao();
     } else {
       throw new Error(`no TaskDao with type ${type}`);

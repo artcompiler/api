@@ -16,6 +16,13 @@ describe('/task endpoint', () => {
       .expect(200, createSuccessResponse({ id: TASK_ID1 }));
   });
 
+  it('POST /task {task:[]}', async () => {
+    await request(app)
+      .post('/task')
+      .send({ task: [TASK1, TASK2] })
+      .expect(200, createSuccessResponse({ id: [TASK_ID1, TASK_ID2] }));
+  });
+
   it('GET /task no ids', async () => {
     await request(app)
       .get(`/task`)
@@ -38,4 +45,5 @@ describe('/task endpoint', () => {
       .get(`/task?id=${[TASK_ID1, TASK_ID2].join(',')}`)
       .expect(200, createSuccessResponse([TASK1, TASK2]));
   });
+
 });

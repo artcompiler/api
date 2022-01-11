@@ -18,13 +18,30 @@ const buildGetTaskHandler = ({ taskDaoFactory }) => buildHttpHandler(async (req,
 });
 
 const buildPostTaskHandler = ({ taskDaoFactory }) => buildHttpHandler(async (req, res) => {
+  console.log("POST /task task=" + JSON.stringify(req.body.task, null, 2));
   const taskDao = taskDaoFactory.create({});
-  const id = await taskDao.create(req.body.task);
+  let id = await taskDao.create(req.body.task);
+  id = id.length === 1 && id[0] || id;
+  console.log("POST /task => id=" + JSON.stringify(id));
   res.status(200).json(createSuccessResponse({ id }));
+});
+
+const optionsTaskHandler = buildHttpHandler(async (req, res) => {
+  try {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Request-Methods", "POST");
+    res.set("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type");
+    res.set("Connection", "Keep-Alive");
+    res.sendStatus(204);
+  } catch (err) {
+    console.log("OPTIONS /task err=" + err);
+    res.statusStatus(500);
+  }
 });
 
 module.exports = ({ taskDaoFactory }) => {
   const router = new Router();
+  router.options('/', optionsTaskHandler),
   router.get('/', buildGetTaskHandler({ taskDaoFactory }));
   router.post('/', buildPostTaskHandler({ taskDaoFactory }));
   return router;
