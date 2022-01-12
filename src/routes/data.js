@@ -21,6 +21,7 @@ const buildGetDataHandler = ({ dataApi }) => buildHttpHandler(async (req, res) =
     return;
   }
   const data = getDataFromData(await dataApi.get(auth, ids));
+  res.set("Access-Control-Allow-Origin", "*");
   res.status(200).json(createSuccessResponse(data));
 });
 

@@ -46,7 +46,7 @@ exports.createSuccessResponse = data => ({
 
 exports.optionsHandler = buildHttpHandler(async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Request-Methods", "GET POST");
+  res.set("Access-Control-Request-Methods", "POST, GET, OPTIONS");
   res.set("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type");
   res.set("Connection", "Keep-Alive");
   res.sendStatus(204);
