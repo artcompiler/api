@@ -10,10 +10,13 @@
   },
   "main": "src/app.js",
   "dependencies": {
+    "@firebase/app": "^0.7.12",
+    "@firebase/firestore": "^3.4.2",
     "bent": "^7.3.12",
     "child_process": "^1.0.2",
     "errorhandler": "^1.5.1",
     "express": "^4.17.2",
+    "firebase-tools": "^10.0.1",
     "graceful-fs": "^4.2.9",
     "hashids": "^2.2.10",
     "jest": "^27.4.7",
@@ -26,7 +29,7 @@
   },
   "scripts": {
     "start": "node src/app.js",
-    "test": "jest",
+    "test": "firebase emulators:exec --ui jest",
     "dev": "nodemon --exec \"npm test && npm start\"",
     "coverage": "nyc npm run test"
   }
